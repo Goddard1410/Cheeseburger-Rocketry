@@ -38,7 +38,7 @@ print('./Plots/Flight/Alt and Dyn Press','-dpng','-r300')
 %% Distribution
 totalLength = totalLength/39.37;
 totalBurnTime = 9.2; % sec
-res = 100;
+res = 200;
 dx = totalLength/res;
 x_nose_tip = linspace(0, totalLength, res);
 tBurn = linspace(0, totalBurnTime, res);
@@ -83,7 +83,6 @@ ylabel("Distance from Nose Tip (in)")
 hold on
 grid on
 plot(tBurn, cg*39.37)
-print('cg','-dpng','-r300')
 print('./Plots/Mass Distro/Total Mass and CG','-dpng','-r300')
 
 % Convert mass to standardized timestep
