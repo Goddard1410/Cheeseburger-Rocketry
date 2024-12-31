@@ -4,7 +4,7 @@ close all;
 warning('off','all')
 
 %% Controlables
-showPlots = true; % true, shows plots
+showPlots = false; % true, shows plots
 plotTime = 20; % seconds, max time displayed on plots
 animationTime = 10; % seconds, amount of time each animation should play
 res = 500; % # of sections across rocket body
