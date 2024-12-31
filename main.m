@@ -4,7 +4,7 @@ close all;
 warning('off','all')
 
 %% Controlables
-showPlots = false; % true, shows plots
+showPlots = true; % true, shows plots
 plotTime = 20; % seconds, max time displayed on plots
 animationTime = 10; % seconds, amount of time each animation should play
 res = 500; % # of sections across rocket body
@@ -281,6 +281,10 @@ if showPlots
     xlabel("Distance from Nose Tip (in)")
     ylabel("\sigma (psi)")
     plot(x_nose_tip*39.37, sigmaNormal(:,sigmaNMaxCol)/6895)
+    yline(100*10^6/6895)
+    yline(200*10^6/6895)
+    annotation('textbox', [0.65, 0.92, 0.3, 0.06], ...
+        "String", "Minimum Margin: " + 100*10^6/max(sigmaNormal(:,sigmaNMaxCol)))
     print('./Plots/Stress/Max Normal Stress','-dpng','-r300')
     
     [sigmaBMax, indexSigmaBMax] = max(abs(sigmaBending(:)));
@@ -292,6 +296,11 @@ if showPlots
     xlabel("Distance from Nose Tip (in)")
     ylabel("\sigma (psi)")
     plot(x_nose_tip*39.37, -sigmaBending(:,sigmaBMaxCol)/6895)
+    yline(40000*cosd(30));
+    yline(40000*cosd(30)/1.5, 'r-');
+    yline(2000*sqrt(2)/2*10^6/6895)
+    annotation('textbox', [0.65, 0.92, 0.3, 0.06], ...
+        "String", "Minimum Margin: " + 40000*cosd(30)/1.5/max(-sigmaBending(:,sigmaBMaxCol)/6895))
     print('./Plots/Stress/Max Bending Stress','-dpng','-r300')
     
     [tauMax, indexTauMax] = max(abs(tau(:)));
@@ -303,6 +312,10 @@ if showPlots
     xlabel("Distance from Nose Tip (in)")
     ylabel("\tau (psi)")
     plot(x_nose_tip*39.37, tau(:,tauMaxCol)/6895)
+    yline(40*10^6/6895)
+    yline(100*10^6/6895)
+    annotation('textbox', [0.65, 0.92, 0.3, 0.06], ...
+        "String", "Minimum Margin: " + 40*10^6/max(tau(:,tauMaxCol)))
     print('./Plots/Stress/Max Shear Stress','-dpng','-r300')
     
     animateSurf(flightTimeSurf, tipDistSurf, sigmaNormal(:,timeRange)/6895, ...
@@ -323,7 +336,7 @@ if showPlots
     view(-55,8)
     print('./Plots/Stress/Normal Stress Surf','-dpng','-r300')
     
-    animateSurf(flightTimeSurf, tipDistSurf, sigmaBending(:,timeRange)/6895, ...
+    animateSurf(flightTimeSurf, tipDistSurf, -sigmaBending(:,timeRange)/6895, ...
         "Bending Stress at Time (sec): ", ...
         ["Distance from Nose Tip (in)", "\sigma (psi)"], ...
         "./Plots/Stress/Bending Stress Vid", ...
