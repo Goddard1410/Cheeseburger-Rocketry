@@ -1,10 +1,9 @@
-function [init_dim_table, final_dim_table, structure_table, rootChord, tipChord, halfSpan, diameter, totalLength, A_ref, inertiaRoll, inertiaLong] = rocketBuildup()
+function [init_dim_table, final_dim_table, structure_table, rootChord, tipChord, halfSpan, diameter, totalLength, A_ref, inertiaRoll] = rocketBuildup()
     %% Constants
-    rootChord = 19.562; % in 17
-    tipChord = 9.5; % in 10.859
+    rootChord = 20; % in 17
+    tipChord = 10; % in 10.859
     halfSpan = 6.5; % in 5
     inertiaRoll = 0.2; % kg m^2
-    inertiaLong = 33; % kg m^2 31.62
     diameter = 6.4; % in
     totalLength = 138.6982; % in
     A_ref = pi*(diameter/2).^2;
@@ -60,14 +59,14 @@ function [init_dim_table, final_dim_table, structure_table, rootChord, tipChord,
     % Format: stucture_table{i, :} = [Start X_dist (in), End X_dist, Start OD, End OD, Thickness, Young's Mod (Pa)]
     structure_table = table();
     structure_table{1, :} = [0, 7.4458, 1/32, 1.4355, 1, 69E9]; % Nosecone Tip
-    structure_table{2, :} = [7.4458, 33.0731, 1.4355 - 1/8, 6, 3/16, 45E9]; % Nosecone (1/8 cork)
+    structure_table{2, :} = [7.4458, 33.0731, 1.4355 - 1/8, 6, 3/16, 24E9]; % Nosecone (1/8 cork)
     structure_table{3, :} = [33.0732, 45.0732, 6, 6, 0.2, 49E9]; % Shoulder (Assuming all load on coupler)
-    structure_table{4, :} = [45.0732, 49.0732, 6.4, 6.4, 0.4, 49E9]; % Switchband
-    structure_table{5, :} = [49.0732, 61.0732, 6, 6, 0.2, 49E9]; % Recovery Airframe (Assuming all load on coupler)
+    structure_table{4, :} = [45.0732, 49.0732, 6.4, 6.4, 0.4, 24E9]; % Switchband
+    structure_table{5, :} = [49.0732, 61.0732, 6, 6, 0.2, 24E9]; % Recovery Airframe (Assuming all load on coupler)
     % structure_table{6, :} = [32.25, 66.25, 6.4, 6.4, .2, 45E9]; % Main Airframe 
     % structure_table{6, :} = [38, 38+17, 6, 6, .25, 45E9]; % Coupler
     structure_table{6, :} = [55.6982, 64.6982, 6.4, 6.4, 0.25, 69E9]; % Motor Coupler
-    structure_table{7, :} = [61.0728, 138.6982, 6.4, 6.4, 0.2, 300E9]; % Motor Casing
+    structure_table{7, :} = [61.0728, 138.6982, 6.4, 6.4, 0.2, 27E9]; % Motor Casing
 
     structure_table = renamevars(structure_table, ["Var1", "Var2", "Var3", "Var4", "Var5", "Var6"], ["X0", "XF", "D0", "DF", "Thick", "E"]);
     structure_table{:, 1:5} = structure_table{:, 1:5}/39.37;

@@ -1,4 +1,4 @@
-function [momentDist, maxRollRate, omega] = rollCalc(rc, tc, halfSpan, diameter, finDeflection, maxSpeed, max_q, mach)
+function [momentDist, maxRollRate, omega] = rollCalc(rc, tc, halfSpan, diameter, finDeflectionAngle, maxSpeed, max_q, mach)
     %% Constants
     rc = rc * 0.0254; % Root Chord in to m
     tc = tc * 0.0254; % Tip Chord in to m
@@ -17,16 +17,16 @@ function [momentDist, maxRollRate, omega] = rollCalc(rc, tc, halfSpan, diameter,
     midchordLineSweepAngle = atan2d(halfSpan, rc/2-tc/2);
     C_na1 = (2*pi*AR*(A_f/A_ref))/(2+sqrt(4+(beta*AR/cosd(midchordLineSweepAngle)).^2));
     
-    M_f = 4*(MACSpanwiseLoc+diameter/2)*C_na1.*finDeflection.*max_q.*A_ref;
+    M_f = 4*(MACSpanwiseLoc+diameter/2)*C_na1.*finDeflectionAngle.*max_q.*A_ref;
 
     %% Damping Moment
     omega = linspace(0,15000, 100);
 
-    C_ldw = (2*4*C_na1)/(A_ref*L_ref.^2).*cosd(finDeflection).*...
+    C_ldw = (2*4*C_na1)/(A_ref*L_ref.^2).*cosd(finDeflectionAngle).*...
             halfSpan/12.*((rc+3*tc)*halfSpan.^2+4*(rc+2*tc)*halfSpan*(diameter/2)+...
             6*(rc+tc)*(diameter/2).^2);
     
-    M_d = zeros(size(finDeflection));
+    M_d = zeros(size(finDeflectionAngle));
 
     for i = 1:length(omega)
         M_f(i,:) = M_f(1,:);

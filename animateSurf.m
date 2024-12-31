@@ -1,5 +1,8 @@
-function animateSurf(X, Y, Z, plotTitle, axisLabels, filename)
+function animateSurf(X, Y, Z, plotTitle, axisLabels, filename, animationTime)
     % Incraments over time slices (X axis)
+    fps = 30;
+    totalFrames = animationTime * fps;
+
     % Initialize the figure
     fig = figure;
     hold on
@@ -12,19 +15,32 @@ function animateSurf(X, Y, Z, plotTitle, axisLabels, filename)
     
     % Define the number of x-slices
     numXSlices = width(X);
+    frameTimes = linspace(1, numXSlices, totalFrames);
     
     % Animation loop
     videoWriter = VideoWriter(filename, "MPEG-4");
+    videoWriter.FrameRate = fps;
     open(videoWriter)
 
-    for i = 1:numXSlices
-        % Extract the current y-slice (fix y and get corresponding x and z values)
-        ySlice = Y(:, i);
-        zSlice = Z(:, i);
+    for i = 1:totalFrames
+        % Interpolate the current frame's slice
+        currentIndex = frameTimes(i);
+        lowerIndex = floor(currentIndex);
+        upperIndex = ceil(currentIndex);
+        
+        % Linear interpolation if between slices
+        if lowerIndex == upperIndex || upperIndex > numXSlices
+            ySlice = Y(:, lowerIndex);
+            zSlice = Z(:, lowerIndex);
+        else
+            alpha = currentIndex - lowerIndex;
+            ySlice = (1 - alpha) * Y(:, lowerIndex) + alpha * Y(:, upperIndex);
+            zSlice = (1 - alpha) * Z(:, lowerIndex) + alpha * Z(:, upperIndex);
+        end
     
         % Plot the x-z slice
         cla; % Clear previous frame
-        title(plotTitle + X(1,i))
+        title(plotTitle + X(1,lowerIndex))
         plot(ySlice, zSlice);
         drawnow; % Update the figure window
         writeVideo(videoWriter, getframe(fig))
