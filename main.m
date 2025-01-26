@@ -3,8 +3,9 @@ clear;
 close all;
 warning('off','all')
 
-%% Controlables
+%% Controllables
 showPlots = true; % true, shows plots
+showSurfs = true; % true, shows surfaces
 plotTime = 20; % seconds, max time displayed on plots
 animationTime = 10; % seconds, amount of time each animation should play
 res = 500; % # of sections across rocket body
@@ -44,11 +45,11 @@ if showPlots
 end
 
 %% Mass Data
-[init_dim_table, final_dim_table, structure_table, rootChord, tipChord, halfSpan, diameter, totalLength, A_ref, inertiaRoll] = rocketBuildup;
+[init_dim_table, final_dim_table, structure_table, POIs, rootChord, tipChord, halfSpan, diameter, totalLength, A_ref, inertiaRoll] = rocketBuildup;
 
 %% Distribution
 totalLength = totalLength/39.37;
-totalBurnTime = 9.2; % sec
+totalBurnTime = 8.2; % sec
 dx = totalLength/res;
 x_nose_tip = linspace(0, totalLength, res);
 tBurn = linspace(0, totalBurnTime, res);
@@ -67,17 +68,19 @@ if showPlots
         "./Plots/Mass Distro/Mass Distro Vid", ...
         animationTime)
     
-    figure
-    hold on
-    grid on
-    surf(tBurnSurf, tipDistSurf, dmdx*2.207)
-    title("Mass Distribution During Flight")
-    xlabel("Time (sec)")
-    ylabel("Distance from Nose Tip (in)")
-    zlabel("Mass (lbs)")
-    shading interp
-    view(-55,8)
-    print('./Plots/Mass Distro/Mass Distro Surf','-dpng','-r300')
+    if showSurfs
+        figure
+        hold on
+        grid on
+        surf(tBurnSurf, tipDistSurf, dmdx*2.207)
+        title("Mass Distribution During Flight")
+        xlabel("Time (sec)")
+        ylabel("Distance from Nose Tip (in)")
+        zlabel("Mass (lbs)")
+        shading interp
+        view(-55,8)
+        print('./Plots/Mass Distro/Mass Distro Surf','-dpng','-r300')
+    end
     
     figure
     subplot(2,1,1)
@@ -186,6 +189,9 @@ if showPlots
     xlabel("Distance from Nose Tip (in)")
     ylabel("Force (N)")
     plot(x_nose_tip*39.37, N(:,NMaxCol))
+    for i = 1:length(POIs)
+        xline(POIs(i))
+    end
     print('./Plots/Force/Max Normal Force','-dpng','-r300')
     
     [VMax, indexVMax] = max(abs(V(:)));
@@ -197,6 +203,9 @@ if showPlots
     xlabel("Distance from Nose Tip (in)")
     ylabel("Force (N)")
     plot(x_nose_tip*39.37, V(:,VMaxCol))
+    for i = 1:length(POIs)
+        xline(POIs(i))
+    end
     print('./Plots/Force/Max Shear Force','-dpng','-r300')
     
     [MMax, indexMMax] = max(abs(M(:)));
@@ -207,62 +216,71 @@ if showPlots
     title("Max Moment")
     xlabel("Distance from Nose Tip (in)")
     ylabel("Moment (N-m)")
-    plot(x_nose_tip*39.37, M(:,MMaxCol))
+    plot(x_nose_tip*39.37, -M(:,MMaxCol))
+    for i = 1:length(POIs)
+        xline(POIs(i))
+    end
     print('./Plots/Force/Max Moment','-dpng','-r300')
     
     animateSurf(flightTimeSurf, tipDistSurf, N(:,timeRange), ...
         "Normal Force at Time (sec): ", ...
         ["Distance from Nose Tip (in)", "Force (N)"], ...
         "./Plots/Force/Normal Force Vid", ...
-        animationTime)
+        animationTime, POIs)
     
-    figure
-    hold on
-    grid on
-    title("Normal Force During Flight")
-    xlabel("Time (sec)")
-    ylabel("Distance from Nose Tip (in)")
-    zlabel("Force (N)")
-    surf(flightTimeSurf, tipDistSurf, N(:,timeRange))
-    shading interp
-    view(-55,8)
-    print('./Plots/Force/Normal Force Surf','-dpng','-r300')
+    if showSurfs
+        figure
+        hold on
+        grid on
+        title("Normal Force During Flight")
+        xlabel("Time (sec)")
+        ylabel("Distance from Nose Tip (in)")
+        zlabel("Force (N)")
+        surf(flightTimeSurf, tipDistSurf, N(:,timeRange))
+        shading interp
+        view(-55,8)
+        print('./Plots/Force/Normal Force Surf','-dpng','-r300')
+    end
     
     animateSurf(flightTimeSurf, tipDistSurf, V(:,timeRange), ...
         "Shear Force at Time (sec): ", ...
         ["Distance from Nose Tip (in)", "Force (N)"], ...
         "./Plots/Force/Shear Force Vid", ...
-        animationTime)
+        animationTime, POIs)
     
-    figure
-    hold on
-    grid on
-    title("Shear Force During Flight")
-    xlabel("Time (sec)")
-    ylabel("Distance from Nose Tip (in)")
-    zlabel("Force (N)")
-    surf(flightTimeSurf, tipDistSurf, V(:,timeRange))
-    shading interp
-    view(-55,8)
-    print('./Plots/Force/Shear Force Surf','-dpng','-r300')
+    if showSurfs
+        figure
+        hold on
+        grid on
+        title("Shear Force During Flight")
+        xlabel("Time (sec)")
+        ylabel("Distance from Nose Tip (in)")
+        zlabel("Force (N)")
+        surf(flightTimeSurf, tipDistSurf, V(:,timeRange))
+        shading interp
+        view(-55,8)
+        print('./Plots/Force/Shear Force Surf','-dpng','-r300')
+    end
     
-    animateSurf(flightTimeSurf, tipDistSurf, M(:,timeRange), ...
+    animateSurf(flightTimeSurf, tipDistSurf, -M(:,timeRange), ...
         "Moment at Time (sec): ", ...
         ["Distance from Nose Tip (in)", "Moment (Nm)"], ...
         "./Plots/Force/Moment Vid", ...
-        animationTime)
+        animationTime, POIs)
     
-    figure
-    hold on
-    grid on
-    title("Moment During Flight")
-    xlabel("Time (sec)")
-    ylabel("Distance from Nose Tip (in)")
-    zlabel("Moment (Nm)")
-    surf(flightTimeSurf, tipDistSurf, M(:,timeRange))
-    shading interp
-    view(-55,8)
-    print('./Plots/Force/Moment Surf','-dpng','-r300')
+    if showSurfs
+        figure
+        hold on
+        grid on
+        title("Moment During Flight")
+        xlabel("Time (sec)")
+        ylabel("Distance from Nose Tip (in)")
+        zlabel("Moment (Nm)")
+        surf(flightTimeSurf, tipDistSurf, -M(:,timeRange))
+        shading interp
+        view(-55,8)
+        print('./Plots/Force/Moment Surf','-dpng','-r300')
+    end
 end
 
 internalForceRuntime = toc
@@ -283,6 +301,9 @@ if showPlots
     plot(x_nose_tip*39.37, sigmaNormal(:,sigmaNMaxCol)/6895)
     yline(100*10^6/6895)
     yline(200*10^6/6895)
+    for i = 1:length(POIs)
+        xline(POIs(i))
+    end
     annotation('textbox', [0.65, 0.92, 0.3, 0.06], ...
         "String", "Minimum Margin: " + 100*10^6/max(sigmaNormal(:,sigmaNMaxCol)))
     print('./Plots/Stress/Max Normal Stress','-dpng','-r300')
@@ -296,8 +317,11 @@ if showPlots
     xlabel("Distance from Nose Tip (in)")
     ylabel("\sigma (psi)")
     plot(x_nose_tip*39.37, -sigmaBending(:,sigmaBMaxCol)/6895)
-    yline(40000*cosd(30));
-    yline(40000*cosd(30)/1.5, 'r-');
+    yline(40000*cosd(30))
+    yline(40000*cosd(30)/1.5, 'r-')
+    for i = 1:length(POIs)
+        xline(POIs(i))
+    end
     yline(2000*sqrt(2)/2*10^6/6895)
     annotation('textbox', [0.65, 0.92, 0.3, 0.06], ...
         "String", "Minimum Margin: " + 40000*cosd(30)/1.5/max(-sigmaBending(:,sigmaBMaxCol)/6895))
@@ -314,6 +338,9 @@ if showPlots
     plot(x_nose_tip*39.37, tau(:,tauMaxCol)/6895)
     yline(40*10^6/6895)
     yline(100*10^6/6895)
+    for i = 1:length(POIs)
+        xline(POIs(i))
+    end
     annotation('textbox', [0.65, 0.92, 0.3, 0.06], ...
         "String", "Minimum Margin: " + 40*10^6/max(tau(:,tauMaxCol)))
     print('./Plots/Stress/Max Shear Stress','-dpng','-r300')
@@ -322,55 +349,61 @@ if showPlots
         "Normal Stress at Time (sec): ", ...
         ["Distance from Nose Tip (in)", "\sigma (psi)"], ...
         "./Plots/Stress/Normal Stress Vid", ...
-        animationTime)
+        animationTime, POIs)
     
-    figure
-    hold on
-    grid on
-    title("Normal Stress During Flight")
-    xlabel("Time (sec)")
-    ylabel("Distance from Nose Tip (in)")
-    zlabel("\sigma (psi)")
-    surf(flightTimeSurf, tipDistSurf, sigmaNormal(:,timeRange)/6895)
-    shading interp
-    view(-55,8)
-    print('./Plots/Stress/Normal Stress Surf','-dpng','-r300')
+    if showSurfs
+        figure
+        hold on
+        grid on
+        title("Normal Stress During Flight")
+        xlabel("Time (sec)")
+        ylabel("Distance from Nose Tip (in)")
+        zlabel("\sigma (psi)")
+        surf(flightTimeSurf, tipDistSurf, sigmaNormal(:,timeRange)/6895)
+        shading interp
+        view(-55,8)
+        print('./Plots/Stress/Normal Stress Surf','-dpng','-r300')
+    end
     
     animateSurf(flightTimeSurf, tipDistSurf, -sigmaBending(:,timeRange)/6895, ...
         "Bending Stress at Time (sec): ", ...
         ["Distance from Nose Tip (in)", "\sigma (psi)"], ...
         "./Plots/Stress/Bending Stress Vid", ...
-        animationTime)
+        animationTime, POIs)
     
-    figure
-    hold on
-    grid on
-    title("Bending Stress During Flight")
-    xlabel("Time (sec)")
-    ylabel("Distance from Nose Tip (in)")
-    zlabel("\sigma (psi)")
-    surf(flightTimeSurf, tipDistSurf, -sigmaBending(:,timeRange)/6895)
-    shading interp
-    view(-55,8)
-    print('./Plots/Stress/Bending Stress Surf','-dpng','-r300')
+    if showSurfs
+        figure
+        hold on
+        grid on
+        title("Bending Stress During Flight")
+        xlabel("Time (sec)")
+        ylabel("Distance from Nose Tip (in)")
+        zlabel("\sigma (psi)")
+        surf(flightTimeSurf, tipDistSurf, -sigmaBending(:,timeRange)/6895)
+        shading interp
+        view(-55,8)
+        print('./Plots/Stress/Bending Stress Surf','-dpng','-r300')
+    end
     
     animateSurf(flightTimeSurf, tipDistSurf, tau(:,timeRange)/6895, ...
         "Shear Stress at Time (sec): ", ...
         ["Distance from Nose Tip (in)", "\tau (psi)"], ...
         "./Plots/Stress/Shear Stress Vid", ...
-        animationTime)
+        animationTime, POIs)
     
-    figure
-    hold on
-    grid on
-    title("Shear Stress During Flight")
-    xlabel("Time (sec)")
-    ylabel("Distance from Nose Tip (in)")
-    zlabel("\tau (psi)")
-    surf(flightTimeSurf, tipDistSurf, tau(:,timeRange)/6895)
-    shading interp
-    view(-55,8)
-    print('./Plots/Stress/Shear Stress Surf','-dpng','-r300')
+    if showSurfs
+        figure
+        hold on
+        grid on
+        title("Shear Stress During Flight")
+        xlabel("Time (sec)")
+        ylabel("Distance from Nose Tip (in)")
+        zlabel("\tau (psi)")
+        surf(flightTimeSurf, tipDistSurf, tau(:,timeRange)/6895)
+        shading interp
+        view(-55,8)
+        print('./Plots/Stress/Shear Stress Surf','-dpng','-r300')
+    end
 end
 
 internalStressRuntime = toc
@@ -389,25 +422,30 @@ if showPlots
     xlabel("Distance from Nose Tip (in)")
     ylabel("Deflection (in)")
     plot(x_nose_tip*39.37, nu(:,nuMaxCol)*39.37)
+    for i = 1:length(POIs)
+        xline(POIs(i))
+    end
     print('./Plots/Deflection/Max Deflection','-dpng','-r300')
     
     animateSurf(flightTimeSurf, tipDistSurf, nu(:,timeRange)*39.37, ...
         "Deflection at Time (sec): ", ...
         ["Distance from Nose Tip (in)", "Deflection (in)"], ...
         "./Plots/Deflection/Deflection Vid", ...
-        animationTime)
+        animationTime, POIs)
     
-    figure
-    hold on
-    grid on
-    title("Deflection During Flight")
-    xlabel("Time (sec)")
-    ylabel("Distance from Nose Tip (in)")
-    zlabel("Deflection (in)")
-    surf(flightTimeSurf, tipDistSurf, nu(:,timeRange)*39.37)
-    shading interp
-    view(-55,8)
-    print('./Plots/Deflection/Deflection Surf','-dpng','-r300')
+    if showSurfs
+        figure
+        hold on
+        grid on
+        title("Deflection During Flight")
+        xlabel("Time (sec)")
+        ylabel("Distance from Nose Tip (in)")
+        zlabel("Deflection (in)")
+        surf(flightTimeSurf, tipDistSurf, nu(:,timeRange)*39.37)
+        shading interp
+        view(-55,8)
+        print('./Plots/Deflection/Deflection Surf','-dpng','-r300')
+    end
 end
 
 deflectionRuntime = toc
@@ -427,19 +465,21 @@ deflectionAngleDist = linspace(0,1.5,res);
 [~, maxRollRate2, ~] = rollCalc(17, 10, 5, diameter, deflectionAngleDist, max_qVel, max_q, max_qMach);
 
 if showPlots
-    figure
-    hold on
-    grid on
-    surf(finDeflectionSurf, omegaSurf, momentDist)
-    plot3(deflectionAngleDist, maxRollRate, zeros(size(deflectionAngleDist)), LineWidth=2, Color="k");
-    title("Net Moment at Fin Deflection and Angular Velocity")
-    xlabel("Fin Deflection (Degrees)")
-    ylabel("Angular Velocity (revs/sec)")
-    zlabel("Net Moment (Nm)")
-    shading interp
-    legend("Moment", "Max Roll Rate")
-    view(-55,8)
-    print('./Plots/Roll/Roll Rate Surf','-dpng','-r300')
+    if showSurfs
+        figure
+        hold on
+        grid on
+        surf(finDeflectionSurf, omegaSurf, momentDist)
+        plot3(deflectionAngleDist, maxRollRate, zeros(size(deflectionAngleDist)), LineWidth=2, Color="k");
+        title("Net Moment at Fin Deflection and Angular Velocity")
+        xlabel("Fin Deflection (Degrees)")
+        ylabel("Angular Velocity (revs/sec)")
+        zlabel("Net Moment (Nm)")
+        shading interp
+        legend("Moment", "Max Roll Rate")
+        view(-55,8)
+        print('./Plots/Roll/Roll Rate Surf','-dpng','-r300')
+    end
     
     figure
     hold on

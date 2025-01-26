@@ -1,4 +1,4 @@
-function animateSurf(X, Y, Z, plotTitle, axisLabels, filename, animationTime)
+function animateSurf(X, Y, Z, plotTitle, axisLabels, filename, animationTime, POIs)
     % Incraments over time slices (X axis)
     fps = 30;
     totalFrames = animationTime * fps;
@@ -42,6 +42,11 @@ function animateSurf(X, Y, Z, plotTitle, axisLabels, filename, animationTime)
         cla; % Clear previous frame
         title(plotTitle + X(1,lowerIndex))
         plot(ySlice, zSlice);
+        if exist('POIs','var') == 1
+            for i = 1:length(POIs)
+                xline(POIs(i))
+            end
+        end
         drawnow; % Update the figure window
         writeVideo(videoWriter, getframe(fig))
     end    
