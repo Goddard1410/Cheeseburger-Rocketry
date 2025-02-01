@@ -4,9 +4,9 @@ close all;
 warning('off','all')
 
 %% Controllables
-showPlots = true; % true, shows plots
-showSurfs = true; % true, shows surfaces
-plotTime = 20; % seconds, max time displayed on plots
+showPlots = false; % true, shows plots
+showSurfs = false; % true, shows surfaces
+plotTime = 10; % seconds, max time displayed on plots
 animationTime = 10; % seconds, amount of time each animation should play
 res = 500; % # of sections across rocket body
 
@@ -221,7 +221,9 @@ if showPlots
         xline(POIs(i))
     end
     print('./Plots/Force/Max Moment','-dpng','-r300')
-    
+    % writematrix(["Distance from Tip (in)", "Max Moment (Nm)"; ...
+    %     x_nose_tip'*39.37, -M(:,MMaxCol)], "Max Moment.csv")
+
     animateSurf(flightTimeSurf, tipDistSurf, N(:,timeRange), ...
         "Normal Force at Time (sec): ", ...
         ["Distance from Nose Tip (in)", "Force (N)"], ...
